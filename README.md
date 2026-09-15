@@ -13,18 +13,13 @@
 
 
 # Heiman Intelligence 
-Official Home Assistant cloud integration for Heiman smart home devices.
-
-> ⚠️ Worth to note:
->
-> Currently this integration supports Heiman Cloud devices only, Local Zigbee device integration is not included at this time.
+Official Home Assistant integration for Heiman smart home devices.
 
 
 ## Overview
 
 Heiman Intelligence brings native integration between Home Assistant and Heiman smart home devices.
 
-The integration provides secure OAuth2 authentication, automatic device discovery, MQTT real-time updates, firmware management, and seamless support for multiple Heiman Intelligence s.
 
 
 ### Key Features
