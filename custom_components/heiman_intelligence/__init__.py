@@ -1,0 +1,196 @@
+"""Heiman Intelligence integration.
+
+Discovery: mDNS/zeroconf (like Shelly)
+  - Matches "heiman*" on _http._tcp.local. and _heiman._tcp.local.
+  - Fetches device info via HTTP to determine model/type
+  - Uses MAC as unique ID for deduplication
+
+Communication: direct HTTP (local, no cloud, no MQTT broker needed)
+  - Periodic polling for state updates (30s interval)
+  - Direct HTTP POST for device control
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import Any
+
+import voluptuous as vol
+
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_PORT
+from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import config_validation as cv
+
+from .const import DOMAIN, PLATFORMS
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+_LOGGER = logging.getLogger(__name__)
+
+SERVICE_SET_PROPERTY = "set_property"
+SERVICE_CALL_ACTION = "call_action"
+SERVICE_INSTALL_FIRMWARE = "install_firmware"
+DEFAULT_OTA_ACTION = "ota_update"
+
+
+async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
+    hass.data.setdefault(DOMAIN, {})
+
+    async def async_set_property(call: ServiceCall) -> None:
+        entry_id = call.data["entry_id"]
+        coordinator = hass.data[DOMAIN].get(entry_id)
+        if coordinator is None:
+            _LOGGER.warning("No Heiman Intelligence config entry found for %s", entry_id)
+            return
+        ok = await coordinator.device.async_set_state(
+            hass,
+            call.data["property"],
+            call.data.get("value"),
+            call.data.get("device_id"),
+        )
+        if ok:
+            await coordinator.async_request_refresh()
+
+    async def async_call_action(call: ServiceCall) -> None:
+        entry_id = call.data["entry_id"]
+        coordinator = hass.data[DOMAIN].get(entry_id)
+        if coordinator is None:
+            _LOGGER.warning("No Heiman Intelligence config entry found for %s", entry_id)
+            return
+        ok = await coordinator.device.async_call_action(
+            hass,
+            call.data["action"],
+            call.data.get("device_id"),
+            call.data.get("params"),
+        )
+        if ok:
+            await coordinator.async_request_refresh()
+
+    async def async_install_firmware(call: ServiceCall) -> None:
+        entry_id = call.data["entry_id"]
+        coordinator = hass.data[DOMAIN].get(entry_id)
+        if coordinator is None:
+            raise HomeAssistantError(
+                f"No Heiman Intelligence config entry found for {entry_id}"
+            )
+
+        params = dict(call.data.get("params") or {})
+        if version := call.data.get("version"):
+            params.setdefault("version", version)
+        if url := call.data.get("url"):
+            params.setdefault("url", url)
+
+        ok = await coordinator.device.async_call_action(
+            hass,
+            call.data.get("action", DEFAULT_OTA_ACTION),
+            call.data.get("device_id"),
+            params,
+        )
+        if not ok:
+            detail = coordinator.device.last_error
+            message = f"Failed to start firmware install on {coordinator.device.host}"
+            if detail:
+                message = f"{message}: {detail}"
+            raise HomeAssistantError(message)
+
+        await coordinator.async_request_refresh()
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SET_PROPERTY,
+        async_set_property,
+        schema=vol.Schema(
+            {
+                vol.Required("entry_id"): str,
+                vol.Optional("device_id"): str,
+                vol.Required("property"): str,
+                vol.Required("value"): object,
+            }
+        ),
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_CALL_ACTION,
+        async_call_action,
+        schema=vol.Schema(
+            {
+                vol.Required("entry_id"): str,
+                vol.Optional("device_id"): str,
+                vol.Required("action"): str,
+                vol.Optional("params"): dict,
+            }
+        ),
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_INSTALL_FIRMWARE,
+        async_install_firmware,
+        schema=vol.Schema(
+            {
+                vol.Required("entry_id"): str,
+                vol.Optional("device_id"): str,
+                vol.Optional("action", default=DEFAULT_OTA_ACTION): str,
+                vol.Optional("version"): str,
+                vol.Optional("url"): str,
+                vol.Optional("params"): dict,
+            }
+        ),
+    )
+    return True
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    from .api import HeimanIntelligenceDevice
+    from .coordinator import HeimanIntelligenceCoordinator
+
+    hass.data.setdefault(DOMAIN, {})
+
+    host = entry.data[CONF_HOST]
+    port = entry.data.get(CONF_PORT, 80)
+
+    device = HeimanIntelligenceDevice(host=host, port=port)
+    coordinator = HeimanIntelligenceCoordinator(hass=hass, entry=entry, device=device)
+    entry.runtime_data = coordinator
+
+    hass.data[DOMAIN][entry.entry_id] = coordinator
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+
+    await coordinator.async_startup_refresh()
+
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    coordinator.async_start_events()
+    coordinator.async_start_reconnect()
+
+    return True
+
+
+async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    coordinator = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if coordinator is None:
+        return
+
+    await coordinator.async_update_connection(
+        entry.data[CONF_HOST],
+        entry.data.get(CONF_PORT, 80),
+    )
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    coordinator = entry.runtime_data
+
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+    if unload_ok:
+        await coordinator.async_shutdown()
+        await coordinator.device.close()
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+        if not hass.data[DOMAIN]:
+            hass.data.pop(DOMAIN, None)
+
+    return unload_ok
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    return True
