@@ -2,7 +2,5 @@
   "name": "Heiman Intelligence",
   "render_readme": true,
   "homeassistant": "2026.5.0",
-  "content_in_root": false,
-  "zip_release": true,
-  "filename": "heiman_intelligence.zip"
+  "content_in_root": false
 }
