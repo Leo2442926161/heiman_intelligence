@@ -29,9 +29,6 @@ The integration provides secure OAuth2 authentication, automatic device discover
 
 ### Key Features
 
-- OAuth2 secure authentication
-- MQTT real-time device updates
-- Multi-home support
 - Firmware update management
 - Device diagnostics
 - Battery monitoring
@@ -63,7 +60,7 @@ The integration provides secure OAuth2 authentication, automatic device discover
 
 ## Installation
 
-### HACS (Recommended)
+### HACS (Requires)
 1. Click the icon and install Heiman Intelligence :
 [![Install Heiman Intelligence ](https://community-assets.home-assistant.io/original/4X/8/c/d/8cd1e59d88b00047b1b5ef5e19611794f3699618.png)](https://my.home-assistant.io/redirect/hacs_repository/?owner=heimanhome&repository=heiman_intelligence&category=integration)
 
