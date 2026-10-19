@@ -2,7 +2,7 @@
 
 ![HACS](https://img.shields.io/badge/HACS-Default-blue)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2026.7%2B-41BDF5)
-![License](https://img.shields.io/badge/License-Apache%202.0-green)
+![License](https://img.shields.io/badge/License-MIT-green)
 </p>
 
 
@@ -57,7 +57,7 @@ Heiman Intelligence brings native integration between Home Assistant and Heiman 
 
 ### HACS (Requires)
 1. Click the icon and install Heiman Intelligence :
-[![Install Heiman Intelligence ](https://community-assets.home-assistant.io/original/4X/8/c/d/8cd1e59d88b00047b1b5ef5e19611794f3699618.png)](https://my.home-assistant.io/redirect/hacs_repository/?owner=heimanhome&repository=heiman_intelligence&category=integration)
+[![Install Heiman Intelligence ](https://community-assets.home-assistant.io/original/4X/8/c/d/8cd1e59d88b00047b1b5ef5e19611794f3699618.png)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Leo2442926161&repository=heiman_intelligence&category=integration)
 
 2. Restart Home Assistant
 
@@ -66,20 +66,24 @@ Heiman Intelligence brings native integration between Home Assistant and Heiman 
 
 ## Configuration
 
-1. Open Home Assistant
-2. Settings → Devices & Services
-3. Add Integration
-4. Search **Heiman Intelligence **
-5. Login using your Heiman account
-6. Authorize Home Assistant
-7. Select your Home
-8. Finish setup
+Home Assistant communicates directly with the device on your local network using
+HTTP and WebSocket. No Heiman account, cloud service, or authorization is needed.
+
+1. Connect the Heiman device or gateway to the same local network as Home Assistant.
+2. Open **Settings → Devices & services** in Home Assistant.
+3. If Home Assistant discovers the device, select **Heiman Intelligence** under
+   **Discovered** and confirm the device details. Discovery uses `heiman*` services
+   on `_http._tcp.local.` or `_heiman._tcp.local.`.
+4. If it is not discovered, select **Add integration**, search for
+   **Heiman Intelligence**, and enter the device's IP address and port (80 by
+   default). Home Assistant connects to the device and completes setup.
 
 ---
 
 
-## Documentation 
-[Heiman Intelligence  – How to Connect Heiman Intelligence  Integration](https://support.heimanhome.com/faq/?type=detail&id=1)
+## Documentation
+
+[Local protocol and gateway notes](docs/protocol-and-gateway-notes.md)
 
 ---
 
