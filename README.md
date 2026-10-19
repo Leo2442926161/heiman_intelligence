@@ -13,12 +13,16 @@
 
 
 # Heiman Intelligence 
-Official Home Assistant integration for Heiman smart home devices.
+Local Home Assistant integration for Heiman devices, gateways, and smart gateway hosts.
 
 
 ## Overview
 
-Heiman Intelligence brings native integration between Home Assistant and Heiman smart home devices.
+Heiman Intelligence connects direct Wi-Fi devices, Heiman local gateways, and
+Heiman smart gateway hosts to Home Assistant over the local network. It exposes
+devices connected to a gateway and prediction results produced by local
+computing as Home Assistant entities. The computing runs on the local host;
+this integration reads its results and device state.
 
 
 
@@ -41,10 +45,6 @@ Heiman Intelligence brings native integration between Home Assistant and Heiman 
 - Heat Alarms (Under Development)
 - Carbon Monoxide Alarms (Planned)
 
-
-### Environmental Sensors
-- Temperature and Humidity Sensors (Planned)
-- Water Leak Sensors
 
 ### Gateways
 - Smart RF Hub (**SubG RF radio only**)
@@ -80,12 +80,6 @@ HTTP and WebSocket. No Heiman account, cloud service, or authorization is needed
 
 ---
 
-
-## Documentation
-
-[Local protocol and gateway notes](docs/protocol-and-gateway-notes.md)
-
----
 
 
 ## Home Assistant Support
