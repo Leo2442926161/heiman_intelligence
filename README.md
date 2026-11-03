@@ -57,7 +57,7 @@ this integration reads its results and device state.
 
 ### HACS (Requires)
 1. Click the icon and install Heiman Intelligence :
-[![Install Heiman Intelligence ](https://img.shields.io/badge/?style=for-the-badge&logo=home-assistant&logoColor=white)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Leo2442926161&repository=heiman_intelligence&category=integration)
+[![HACS Heiman Intelligence](https://img.shields.io/badge/HACS-Heimani%20Intelligence-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Leo2442926161&repository=heiman_intelligence&category=integration)
 
 
 
