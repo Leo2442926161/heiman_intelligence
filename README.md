@@ -57,7 +57,7 @@ this integration reads its results and device state.
 
 ### HACS (Requires)
 1. Click the icon and install Heiman Intelligence :
-[![Install Heiman Intelligence ](https://community-assets.home-assistant.io/original/4X/8/c/d/8cd1e59d88b00047b1b5ef5e19611794f3699618.png)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Leo2442926161&repository=heiman_intelligence&category=integration)
+[![Install Heiman Intelligence](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Leo2442926161&repository=heiman_intelligence&category=integration)
 
 2. Restart Home Assistant
 
@@ -70,7 +70,7 @@ Home Assistant communicates directly with the device on your local network using
 HTTP and WebSocket. No Heiman account, cloud service, or authorization is needed.
 
 1. Connect the Heiman device or gateway to the same local network as Home Assistant.
-2. Open **Settings → Devices & services** in Home Assistant.
+2. Open **Settings ↄ1�7 Devices & services** in Home Assistant.
 3. If Home Assistant discovers the device, select **Heiman Intelligence** under
    **Discovered** and confirm the device details. Discovery uses `heiman*` services
    on `_http._tcp.local.` or `_heiman._tcp.local.`.
