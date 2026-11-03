@@ -73,7 +73,7 @@ Home Assistant communicates directly with the device on your local network using
 HTTP and WebSocket. No Heiman account, cloud service, or authorization is needed.
 
 1. Connect the Heiman device or gateway to the same local network as Home Assistant.
-2. Open **Settings 鈫� Devices & services** in Home Assistant.
+2. Open **Settings 鈫� Devices & services** in Home Assistant.
 3. If Home Assistant discovers the device, select **Heiman Intelligence** under
    **Discovered** and confirm the device details. Discovery uses `heiman*` services
    on `_http._tcp.local.` or `_heiman._tcp.local.`.
